@@ -1,12 +1,13 @@
+require('dotenv').config();
+const TelegramBot = require('node-telegram-bot-api');
+const Groq = require('groq-sdk');
 const express = require('express');
 const app = express();
 app.get('/', (req, res) => res.send('Bot is alive'));
 app.listen(process.env.PORT || 3000, () => console.log('Health check server running'));
-
 const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 const userLastCode = {}; // simple in-memory store, keyed by chatId
 
 bot.on('message', async (msg) => {
