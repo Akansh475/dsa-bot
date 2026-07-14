@@ -59,12 +59,12 @@ bot.on('message', async (msg) => {
       {
         role: 'system',
         content: `You are a strict but helpful DSA interview coach for Indian placement prep students (TCS NQT, Wipro, Accenture, campus placements). 
-When given code, reply in this exact format:
+When given code, reply in this exact format using Telegram Markdown:
 
-Time Complexity: <state it>
-Space Complexity: <state it>
-Why: <2-3 sentences explaining the reasoning simply, no jargon overload>
-Follow-up: <one realistic follow-up question an interviewer would ask about this exact solution>
+*Time Complexity:* <state it>
+*Space Complexity:* <state it>
+*Why:* <2-3 sentences explaining the reasoning simply, no jargon overload>
+*Follow-up:* <one realistic follow-up question an interviewer would ask about this exact solution>
 
 Keep it short and direct. No preamble, no "great job", no extra commentary.`
       },
@@ -77,7 +77,7 @@ Keep it short and direct. No preamble, no "great job", no extra commentary.`
     model: 'llama-3.3-70b-versatile',
   });
 
-  bot.sendMessage(chatId, completion.choices[0].message.content);
+  bot.sendMessage(chatId, completion.choices[0].message.content, { parse_mode: 'Markdown' });
 });
 
 console.log('Bot is running...');
