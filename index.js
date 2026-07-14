@@ -5,14 +5,40 @@ const express = require('express');
 const app = express();
 app.get('/', (req, res) => res.send('Bot is alive'));
 app.listen(process.env.PORT || 3000, () => console.log('Health check server running'));
+
 const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
 const userLastCode = {}; // simple in-memory store, keyed by chatId
+const userUsage = {}; // { chatId: { count: 0, date: '2026-07-14' } }
+const upgradedUsers = new Set(); // chatIds you manually add after payment
+const FREE_LIMIT = 3;
+
+function getToday() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function checkAndIncrementUsage(chatId) {
+  const today = getToday();
+  if (!userUsage[chatId] || userUsage[chatId].date !== today) {
+    userUsage[chatId] = { count: 0, date: today };
+  }
+  if (upgradedUsers.has(chatId)) return true; // no limit for upgraded users
+  if (userUsage[chatId].count >= FREE_LIMIT) return false; // limit hit
+  userUsage[chatId].count++;
+  return true;
+}
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
+
+  const allowed = checkAndIncrementUsage(chatId);
+  if (!allowed) {
+    bot.sendMessage(chatId, `You've hit your free limit of ${FREE_LIMIT} checks today. Upgrade for unlimited access — DM @Akansh075 to unlock.`);
+    return;
+  }
 
   bot.sendMessage(chatId, "Analyzing...");
 
@@ -27,7 +53,7 @@ bot.on('message', async (msg) => {
       },
       { role: 'user', content: `Code:\n${userLastCode[chatId]}\n\nFollow-up question: ${text}` }
     ];
-} else {
+  } else {
     userLastCode[chatId] = text; // save this as their latest code
     messages = [
       {
