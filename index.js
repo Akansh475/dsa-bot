@@ -34,9 +34,14 @@ bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
+  if (text === '/start') {
+    bot.sendMessage(chatId, "Paste your DSA code and I'll tell you the time/space complexity, why, and the exact follow-up your interviewer will ask.");
+    return;
+  }
+
   const allowed = checkAndIncrementUsage(chatId);
   if (!allowed) {
-    bot.sendMessage(chatId, `You've hit your free limit of ${FREE_LIMIT} checks today. Upgrade for unlimited access — DM @Akansh075 to unlock.`);
+    bot.sendMessage(chatId, `You've hit your free limit of ${FREE_LIMIT} checks today.\n\nUpgrade to unlimited for ₹99/month:\nUPI: your-akanshm402@okhdfcbank\n\nAfter paying, send a screenshot to @Akansh075 to unlock instantly.\n\nYour user ID: ${chatId}`);
     return;
   }
 
@@ -54,7 +59,7 @@ bot.on('message', async (msg) => {
       { role: 'user', content: `Code:\n${userLastCode[chatId]}\n\nFollow-up question: ${text}` }
     ];
   } else {
-    userLastCode[chatId] = text; // save this as their latest code
+    userLastCode[chatId] = text; // 
     messages = [
       {
         role: 'system',
