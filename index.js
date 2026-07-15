@@ -12,7 +12,7 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const userLastCode = {}; // simple in-memory store, keyed by chatId
 const userUsage = {}; // { chatId: { count: 0, date: '2026-07-14' } }
-const upgradedUsers = new Set(); // chatIds you manually add after payment
+const upgradedUsers = new Set([7239902745]); // add real chatIds here after payment
 const FREE_LIMIT = 3;
 
 function getToday() {
@@ -41,7 +41,7 @@ bot.on('message', async (msg) => {
 
   const allowed = checkAndIncrementUsage(chatId);
   if (!allowed) {
-    bot.sendMessage(chatId, `You've hit your free limit of ${FREE_LIMIT} checks today.\n\nUpgrade to unlimited for ₹99/month:\nUPI: your-akanshm402@okhdfcbank\n\nAfter paying, send a screenshot to @Akansh075 to unlock instantly.\n\nYour user ID: ${chatId}`);
+    bot.sendMessage(chatId, `You've hit your free limit of ${FREE_LIMIT} checks today.\n\nUpgrade to unlimited for ₹99/month:\nUPI: your-upi-id@bank\n\nAfter paying, send a screenshot to @Akansh075 to unlock instantly.\n\nYour user ID: ${chatId}`);
     return;
   }
 
@@ -59,7 +59,7 @@ bot.on('message', async (msg) => {
       { role: 'user', content: `Code:\n${userLastCode[chatId]}\n\nFollow-up question: ${text}` }
     ];
   } else {
-    userLastCode[chatId] = text; // 
+    userLastCode[chatId] = text; // save this as their latest code
     messages = [
       {
         role: 'system',
